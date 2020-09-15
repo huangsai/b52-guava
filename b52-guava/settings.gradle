@@ -1,0 +1,6 @@
+include ':guava-https'
+include ':guava-android-mvvm'
+include ':guava-jvm'
+include ':guava-android'
+include ':guava-android-ui'
+include ':app'
