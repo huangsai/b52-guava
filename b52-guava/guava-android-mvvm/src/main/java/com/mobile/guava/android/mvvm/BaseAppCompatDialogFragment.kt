@@ -3,7 +3,6 @@ package com.mobile.guava.android.mvvm
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatDialogFragment
-import com.mobile.guava.jvm.coroutines.Bus
 
 abstract class BaseAppCompatDialogFragment : AppCompatDialogFragment() {
 

@@ -34,5 +34,9 @@ package com.mobile.guava.jvm.extension
  *     is AnotherType -> //
  * }.exhaustive
  */
-val <T> T.exhaustive: T
-    get() = this
+val <T> T.exhaustive: T get() = this
+
+/**
+ * type cast
+ */
+inline fun <reified T> Any.cast(): T = this as T
