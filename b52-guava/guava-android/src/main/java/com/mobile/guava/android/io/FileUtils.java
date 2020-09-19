@@ -683,7 +683,6 @@ public class FileUtils {
             Toast.makeText(context, "您的sd卡不可用!", Toast.LENGTH_LONG).show();
             return null;
         } else {
-            System.out.println("createFile1:" + bitmap.getRowBytes() * bitmap.getHeight() / 1024 + "kb");
             File file = new File(getIndividualCacheDirectory(context), fileName);
             if (file.exists()) {
                 file.delete();
@@ -695,10 +694,8 @@ public class FileUtils {
                 file.createNewFile();
                 FileOutputStream e = new FileOutputStream(file);
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 90, e);
-                System.out.println("createFile2:第一次/" + file.length() / 1024L + "kb");
 
                 while (file.length() / 1024L > 100L && quality > 0) {
-                    //先重置FileOutputStream
                     e.close();
                     e = new FileOutputStream(file);
 
@@ -706,7 +703,6 @@ public class FileUtils {
                     bitmap.compress(Bitmap.CompressFormat.JPEG, quality, e);
                 }
 
-                System.out.println("createFile2:最后一次/" + file.length() / 1024L + "kb");
             } catch (IOException var5) {
                 var5.printStackTrace();
             }
