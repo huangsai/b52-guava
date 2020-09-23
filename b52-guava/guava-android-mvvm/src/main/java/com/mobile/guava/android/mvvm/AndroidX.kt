@@ -2,12 +2,13 @@ package com.mobile.guava.android.mvvm
 
 import android.app.Application
 import androidx.lifecycle.MutableLiveData
+import com.mobile.guava.jvm.Guava
 import com.mobile.guava.jvm.coroutines.Bus
+import timber.log.Timber
 
 object AndroidX {
 
     const val APK_PACKAGE_ARCHIVE_TYPE = "application/vnd.android.package-archive"
-    const val SQL_DB3 = "sql.db3"
     const val ASSETS = "file:///android_asset/"
 
     const val BUS_EXIT = 9000
@@ -19,20 +20,25 @@ object AndroidX {
     val appDialogCount: MutableLiveData<Int> = MutableLiveData(0)
 
     @get:JvmName("isNetworkConnected")
-    val isNetworkConnected: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isNetworkConnected: MutableLiveData<Boolean> = MutableLiveData()
 
     @get:JvmName("isAppInForeground")
-    val isAppInForeground: MutableLiveData<Boolean> = MutableLiveData(false)
-
-    @get:JvmName("isSocketConnected")
-    val isSocketConnected: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isAppInForeground: MutableLiveData<Boolean> = MutableLiveData()
 
     @get:JvmName("myApp")
     lateinit var myApp: Application
         private set
 
-    fun setup(app: Application) {
+    fun setup(app: Application, isDebug: Boolean) {
+        if (::myApp.isInitialized) {
+            return
+        }
         myApp = app
+        Guava.isDebug = isDebug
+        Guava.timber = AppTimber()
+        if (isDebug) {
+            Timber.plant(Timber.DebugTree())
+        }
     }
 
     fun exitSystem() = Bus.offer(BUS_EXIT)

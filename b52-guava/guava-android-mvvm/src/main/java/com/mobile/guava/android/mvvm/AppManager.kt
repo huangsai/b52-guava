@@ -17,17 +17,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
-import com.mobile.guava.jvm.coroutines.Bus
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 import java.lang.ref.WeakReference
 
-abstract class BaseAppManager : LifecycleObserver, Application.ActivityLifecycleCallbacks {
+object AppManager : LifecycleObserver, Application.ActivityLifecycleCallbacks {
 
-    private var isFirstActivityLaunch = true
+    @Volatile
+    private var isInitialize = false
 
     private val cm by lazy {
         AndroidX.myApp.getSystemService<ConnectivityManager>()!!
@@ -45,26 +41,26 @@ abstract class BaseAppManager : LifecycleObserver, Application.ActivityLifecycle
 
     @SuppressLint("MissingPermission")
     fun initialize() {
+        if (isInitialize) {
+            return
+        }
+        isInitialize = true
         AndroidX.myApp.registerActivityLifecycleCallbacks(this)
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
         notifyNetworkChanged(isNetworkConnected())
         monitorNetworkConnectivity()
-        Bus.subscribe()
-            .onEach { onBusEvent(it) }
-            .catch { e -> e.printStackTrace() }
-            .launchIn(GlobalScope)
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onMoveToForeground() {
         Timber.d("isAppInForeground true")
-        AndroidX.isAppInForeground.postValue(true)
+        AndroidX.isAppInForeground.value = true
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onMoveToBackground() {
         Timber.d("isAppInForeground false")
-        AndroidX.isAppInForeground.postValue(false)
+        AndroidX.isAppInForeground.value = false
     }
 
     override fun onActivityPaused(activity: Activity) {
@@ -72,9 +68,6 @@ abstract class BaseAppManager : LifecycleObserver, Application.ActivityLifecycle
 
     override fun onActivityResumed(activity: Activity) {
         weakCurrentActivity = WeakReference(activity)
-        if (isFirstActivityLaunch) {
-            isFirstActivityLaunch = false
-        }
     }
 
     override fun onActivityStarted(activity: Activity) {
@@ -219,7 +212,7 @@ abstract class BaseAppManager : LifecycleObserver, Application.ActivityLifecycle
     @RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
     private fun notifyNetworkChanged(isConnected: Boolean) {
         if (isConnected != AndroidX.isNetworkConnected.value) {
-            AndroidX.isNetworkConnected.postValue(isConnected)
+            AndroidX.isNetworkConnected.value = isConnected
         }
     }
 
@@ -233,6 +226,4 @@ abstract class BaseAppManager : LifecycleObserver, Application.ActivityLifecycle
             info?.isConnectedOrConnecting ?: false
         }
     }
-
-    abstract fun onBusEvent(event: Pair<Int, Any>)
 }
