@@ -23,7 +23,7 @@ import java.lang.ref.WeakReference
 object AppManager : LifecycleObserver, Application.ActivityLifecycleCallbacks {
 
     @Volatile
-    private var isInitialize = false
+    private var isInitialized = false
 
     private val cm by lazy {
         AndroidX.myApp.getSystemService<ConnectivityManager>()!!
@@ -41,10 +41,10 @@ object AppManager : LifecycleObserver, Application.ActivityLifecycleCallbacks {
 
     @SuppressLint("MissingPermission")
     fun initialize() {
-        if (isInitialize) {
+        if (isInitialized) {
             return
         }
-        isInitialize = true
+        isInitialized = true
         AndroidX.myApp.registerActivityLifecycleCallbacks(this)
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
         notifyNetworkChanged(isNetworkConnected())

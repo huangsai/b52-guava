@@ -15,6 +15,7 @@ object AndroidX {
     const val BUS_LOGOUT = 9001
     const val BUS_LOGIN = 9002
     const val BUS_DIALOG_COUNT = 9003
+    const val BUS_DIALOG_CLOSE = 9004
 
     @get:JvmName("appDialogCount")
     val appDialogCount: MutableLiveData<Int> = MutableLiveData(0)
