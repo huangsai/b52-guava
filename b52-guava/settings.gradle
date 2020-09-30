@@ -1,4 +1,4 @@
-include ':guava-https'
+include ':guava-data'
 include ':guava-android-mvvm'
 include ':guava-jvm'
 include ':guava-android'

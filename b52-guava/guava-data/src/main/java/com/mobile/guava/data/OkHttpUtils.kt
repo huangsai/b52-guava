@@ -1,4 +1,4 @@
-package com.mobile.guava.https
+package com.mobile.guava.data
 
 import com.mobile.guava.jvm.Guava
 import okhttp3.OkHttpClient
@@ -24,7 +24,7 @@ fun cancelOkHttp3Request(client: OkHttpClient) {
 }
 
 fun createPoorSSLOkHttpClient(loggerTag: String): OkHttpClient {
-    val httpsModule = SimpleHttpsModule()
+    val httpsModule = SimpleDataModule()
     val poorX509TrustManager = httpsModule.providePoorX509TrustManager()
     val poorSSLContext = httpsModule.providePoorSSLContext(poorX509TrustManager)
     val httpLoggingInterceptorLogger = object : HttpLoggingInterceptor.Logger {

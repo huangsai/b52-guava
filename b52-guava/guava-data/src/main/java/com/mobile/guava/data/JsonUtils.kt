@@ -1,4 +1,4 @@
-package com.mobile.guava.https
+package com.mobile.guava.data
 
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi

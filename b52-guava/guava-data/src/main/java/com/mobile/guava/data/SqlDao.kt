@@ -1,4 +1,4 @@
-package com.mobile.guava.https
+package com.mobile.guava.data
 
 import androidx.room.Delete
 import androidx.room.Insert

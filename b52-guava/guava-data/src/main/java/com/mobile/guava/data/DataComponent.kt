@@ -1,4 +1,4 @@
-package com.mobile.guava.https
+package com.mobile.guava.data
 
 import com.squareup.moshi.Moshi
 import okhttp3.OkHttpClient
@@ -7,7 +7,7 @@ import retrofit2.Retrofit
 import javax.net.ssl.SSLContext
 import javax.net.ssl.X509TrustManager
 
-interface HttpsComponent {
+interface DataComponent {
 
     fun poorX509TrustManager(): X509TrustManager
 

@@ -1,4 +1,4 @@
-package com.mobile.guava.https
+package com.mobile.guava.data
 
 fun Int?.nullSafe(): Int = this ?: 0
 

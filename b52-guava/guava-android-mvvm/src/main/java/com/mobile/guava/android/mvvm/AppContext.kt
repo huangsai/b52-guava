@@ -1,6 +1,6 @@
 package com.mobile.guava.android.mvvm
 
-import com.mobile.guava.https.PlatformContext
+import com.mobile.guava.data.PlatformContext
 import java.io.File
 
 class AppContext : PlatformContext {

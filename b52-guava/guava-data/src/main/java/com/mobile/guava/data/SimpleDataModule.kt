@@ -1,4 +1,4 @@
-package com.mobile.guava.https
+package com.mobile.guava.data
 
 import com.mobile.guava.jvm.Guava
 import com.squareup.moshi.Moshi
@@ -19,7 +19,7 @@ import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
-class SimpleHttpsModule : HttpsModule {
+class SimpleDataModule : DataModule {
 
     override fun providePoorX509TrustManager(): X509TrustManager {
         return object : X509TrustManager {
