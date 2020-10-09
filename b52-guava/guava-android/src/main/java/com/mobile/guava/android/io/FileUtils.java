@@ -674,7 +674,7 @@ public class FileUtils {
         return dir != null && dir.exists() && dir.isDirectory();
     }
 
-
+    @Nullable
     public static File createFile(Bitmap bitmap, Context context, String fileName) {
         File file = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), fileName);
         if (file.exists()) {
@@ -703,6 +703,7 @@ public class FileUtils {
         return file;
     }
 
+    @Nullable
     public static File createFile(Bitmap bitmap, Context context) {
         return createFile(bitmap, context, System.currentTimeMillis() + ".jpg");
     }
