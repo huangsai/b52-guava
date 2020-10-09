@@ -9,9 +9,13 @@ class AppContext : PlatformContext {
 
     override fun getFilesDir(): File = AndroidX.myApp.filesDir
 
-    override fun getDatabasePath(name: String): File = AndroidX.myApp.getDatabasePath(name)!!
+    override fun getDatabasePath(name: String): File {
+        return AndroidX.myApp.getDatabasePath(name)!!
+    }
 
-    override fun getExternalCacheDir(): File = AndroidX.myApp.externalCacheDir!!
+    override fun getExternalCacheDir(): File {
+        return AndroidX.myApp.externalCacheDir!!
+    }
 
     override fun getExternalFilesDir(type: String?): File {
         return AndroidX.myApp.getExternalFilesDir(type)!!

@@ -5,4 +5,7 @@ dependencies {
     implementation 'com.mobile.guava:guava-jvm:0.2.0'
     implementation 'com.mobile.guava:guava-android:0.2.0'
     implementation 'com.mobile.guava:guava-data:0.2.0'
+    implementation dep.androidX.datastore.preferences
+
+    implementation project(':guava-data')
 }
