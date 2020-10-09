@@ -21,7 +21,7 @@ buildscript {
                 buildConfig.version.build
 
         ext.versions = [
-                'mavenPublish'     : '0.12.0',
+                'mavenPublish'     : '0.13.0',
                 'desugaring'       : '1.0.9',
                 'ktLint'           : '9.1.0',
                 'kotlin'           : '1.4.10',
@@ -59,9 +59,9 @@ buildscript {
                 'flexbox'          : '2.0.1',
                 'fabric'           : '1.4.8',
                 'store'            : '4.0.0-beta01',
-                'theGuava'         : '0.2.0',
-                'theExt'           : '0.0.2',
-                'theSdk'           : '0.0.2',
+                'theGuava'         : '0.2.1',
+                'theExt'           : '0.0.3',
+                'theSdk'           : '0.0.3',
                 'pacificAdapter'   : '3.0.3',
                 'exoplayer'        : '2.12.0',
 
@@ -167,7 +167,7 @@ buildscript {
                 'junit'            : "junit:junit:${versions.junit}",
                 'mockito'          : "org.mockito:mockito-core:${versions.mockito}",
                 'truth'            : "com.google.truth:truth:${versions.truth}",
-                'mmkv'             : "com.tencent:mmkv:${versions.mmkv}",
+                'mmkv'             : "com.tencent:mmkv-static:${versions.mmkv}",
                 'gravitySnapHelper': "com.github.rubensousa:gravitysnaphelper:${versions.gravitySnapHelper}",
                 'leakcanary'       : "com.squareup.leakcanary:leakcanary-android:${versions.leakcanary}",
                 'javaxAnnotation'  : "javax.annotation:javax.annotation-api:${versions.javaxAnnotation}",

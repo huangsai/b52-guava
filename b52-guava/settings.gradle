@@ -1,6 +1,6 @@
 include ':guava-data'
-include ':guava-android-mvvm'
 include ':guava-jvm'
 include ':guava-android'
+include ':guava-android-mvvm'
 include ':guava-android-ui'
 include ':app'
