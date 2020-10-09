@@ -12,7 +12,6 @@ import android.os.Build
 import android.os.Bundle
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
-import androidx.core.content.getSystemService
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
@@ -26,7 +25,7 @@ object AppManager : LifecycleObserver, Application.ActivityLifecycleCallbacks {
     private var isInitialized = false
 
     private val cm by lazy {
-        AndroidX.myApp.getSystemService<ConnectivityManager>()!!
+        AndroidX.myApp.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     }
 
     private val networkBroadcastReceiver by lazy {
@@ -41,13 +40,12 @@ object AppManager : LifecycleObserver, Application.ActivityLifecycleCallbacks {
 
     @SuppressLint("MissingPermission")
     fun initialize() {
-        if (isInitialized) {
-            return
-        }
+        if (isInitialized) return
+
         isInitialized = true
         AndroidX.myApp.registerActivityLifecycleCallbacks(this)
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
-        notifyNetworkChanged(isNetworkConnected())
+        notifyNetworkChanged(isNetworkAvailable())
         monitorNetworkConnectivity()
     }
 
@@ -63,26 +61,26 @@ object AppManager : LifecycleObserver, Application.ActivityLifecycleCallbacks {
         AndroidX.isAppInForeground.value = false
     }
 
-    override fun onActivityPaused(activity: Activity) {
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+    }
+
+    override fun onActivityStarted(activity: Activity) {
     }
 
     override fun onActivityResumed(activity: Activity) {
         weakCurrentActivity = WeakReference(activity)
     }
 
-    override fun onActivityStarted(activity: Activity) {
-    }
-
-    override fun onActivityDestroyed(activity: Activity) {
-    }
-
-    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle?) {
+    override fun onActivityPaused(activity: Activity) {
     }
 
     override fun onActivityStopped(activity: Activity) {
     }
 
-    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
+    }
+
+    override fun onActivityDestroyed(activity: Activity) {
     }
 
     fun currentActivity(): Activity? {
@@ -101,6 +99,7 @@ object AppManager : LifecycleObserver, Application.ActivityLifecycleCallbacks {
                     NetworkRequest.Builder()
                         .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
                         .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                        .addTransportType(NetworkCapabilities.TRANSPORT_ETHERNET)
                         .build(),
                     networkCallback
                 )
@@ -217,13 +216,13 @@ object AppManager : LifecycleObserver, Application.ActivityLifecycleCallbacks {
     }
 
     @RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
-    private fun isNetworkConnected(): Boolean {
+    private fun isNetworkAvailable(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val capabilities: NetworkCapabilities? = cm.getNetworkCapabilities(cm.activeNetwork)
-            capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) ?: false
+            cm.getNetworkCapabilities(cm.activeNetwork)
+                ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                ?: false
         } else {
-            val info: NetworkInfo? = cm.activeNetworkInfo
-            info?.isConnectedOrConnecting ?: false
+            cm.activeNetworkInfo?.isConnectedOrConnecting ?: false
         }
     }
 }
