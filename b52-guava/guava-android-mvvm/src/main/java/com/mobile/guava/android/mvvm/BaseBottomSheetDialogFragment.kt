@@ -15,7 +15,7 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
         protected set
 
     var onResumeCount = 0
-        protected set
+        private set
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
