@@ -12,6 +12,9 @@ import kotlinx.coroutines.flow.onEach
 
 abstract class BaseFragment(@LayoutRes contentLayoutId: Int = 0) : Fragment(contentLayoutId) {
 
+    var onResumeCount = 0
+        protected set
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Bus.subscribe()
@@ -29,6 +32,11 @@ abstract class BaseFragment(@LayoutRes contentLayoutId: Int = 0) : Fragment(cont
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view.isClickable = true
+    }
+
+    override fun onResume() {
+        super.onResume()
+        onResumeCount++
     }
 
     open fun onBackPressed(): Boolean = false

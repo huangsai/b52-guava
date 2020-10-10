@@ -14,6 +14,9 @@ abstract class BaseAppCompatDialogFragment : AppCompatDialogFragment() {
     var applyDialogCount = false
         protected set
 
+    var onResumeCount = 0
+        protected set
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Bus.subscribe()
@@ -35,6 +38,11 @@ abstract class BaseAppCompatDialogFragment : AppCompatDialogFragment() {
         if (applyDialogCount) {
             AndroidX.notifyDialogShow()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        onResumeCount++
     }
 
     override fun onDestroy() {
