@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.PopupWindow
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -13,6 +14,62 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.snackbar.Snackbar
 import org.joor.Reflect
+
+val getContent: ActivityResultContracts.GetContent by lazy {
+    ActivityResultContracts.GetContent()
+}
+
+val getMultipleContents: ActivityResultContracts.GetMultipleContents by lazy {
+    ActivityResultContracts.GetMultipleContents()
+}
+
+val createDocument: ActivityResultContracts.CreateDocument by lazy {
+    ActivityResultContracts.CreateDocument()
+}
+
+val openDocument: ActivityResultContracts.OpenDocument by lazy {
+    ActivityResultContracts.OpenDocument()
+}
+
+val openDocumentTree: ActivityResultContracts.OpenDocumentTree by lazy {
+    ActivityResultContracts.OpenDocumentTree()
+}
+
+val openMultipleDocuments: ActivityResultContracts.OpenMultipleDocuments by lazy {
+    ActivityResultContracts.OpenMultipleDocuments()
+}
+
+val requestMultiplePermissions: ActivityResultContracts.RequestMultiplePermissions by lazy {
+    ActivityResultContracts.RequestMultiplePermissions()
+}
+
+val requestPermission: ActivityResultContracts.RequestPermission by lazy {
+    ActivityResultContracts.RequestPermission()
+}
+
+val pickContact: ActivityResultContracts.PickContact by lazy {
+    ActivityResultContracts.PickContact()
+}
+
+val startActivityForResult: ActivityResultContracts.StartActivityForResult by lazy {
+    ActivityResultContracts.StartActivityForResult()
+}
+
+val startIntentSenderForResult: ActivityResultContracts.StartIntentSenderForResult by lazy {
+    ActivityResultContracts.StartIntentSenderForResult()
+}
+
+val takePicture: ActivityResultContracts.TakePicture by lazy {
+    ActivityResultContracts.TakePicture()
+}
+
+val takePicturePreview: ActivityResultContracts.TakePicturePreview by lazy {
+    ActivityResultContracts.TakePicturePreview()
+}
+
+val takeVideo: ActivityResultContracts.TakeVideo by lazy {
+    ActivityResultContracts.TakeVideo()
+}
 
 fun FragmentActivity.showDialogFragment(dialogFragment: DialogFragment) {
     showDialogFragment(this.supportFragmentManager, dialogFragment)

@@ -1,7 +1,6 @@
 package com.mobile.guava.android.mvvm
 
 import android.content.Intent
-import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 import android.os.Bundle
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
@@ -18,7 +17,7 @@ abstract class BaseActivity(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requestedOrientation = SCREEN_ORIENTATION_PORTRAIT
+
         AndroidX.isAppInForeground.observe(this, {
             if (it == true) {
                 onMoveToForeground()

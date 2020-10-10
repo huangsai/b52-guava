@@ -51,7 +51,7 @@ object AppOAuth2Prefs : OAuth2Prefs {
                 deviceId = try {
                     uniqueId(AndroidX.myApp)
                 } catch (ignored: Exception) {
-                    Timber.e(ignored)
+                    Timber.d(ignored)
                     getRandomUUID()
                 }
                 dataStore.encode("deviceId", deviceId)
