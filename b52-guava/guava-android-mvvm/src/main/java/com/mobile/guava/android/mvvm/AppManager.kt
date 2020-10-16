@@ -16,6 +16,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
+import com.mobile.guava.android.net.isNetworkAvailable
 import timber.log.Timber
 import java.lang.ref.WeakReference
 
@@ -45,7 +46,7 @@ object AppManager : LifecycleObserver, Application.ActivityLifecycleCallbacks {
         isInitialized = true
         AndroidX.myApp.registerActivityLifecycleCallbacks(this)
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
-        notifyNetworkChanged(isNetworkAvailable())
+        notifyNetworkChanged(isNetworkAvailable(AndroidX.myApp))
         monitorNetworkConnectivity()
     }
 
@@ -212,17 +213,6 @@ object AppManager : LifecycleObserver, Application.ActivityLifecycleCallbacks {
     private fun notifyNetworkChanged(isConnected: Boolean) {
         if (isConnected != AndroidX.isNetworkConnected.value) {
             AndroidX.isNetworkConnected.value = isConnected
-        }
-    }
-
-    @RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
-    private fun isNetworkAvailable(): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            cm.getNetworkCapabilities(cm.activeNetwork)
-                ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-                ?: false
-        } else {
-            cm.activeNetworkInfo?.isConnectedOrConnecting ?: false
         }
     }
 }

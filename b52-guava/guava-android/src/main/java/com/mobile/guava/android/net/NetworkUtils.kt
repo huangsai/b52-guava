@@ -16,29 +16,20 @@ const val NETWORK_TYPE_3_G = 3
 const val NETWORK_TYPE_4_G = 4
 const val NETWORK_TYPE_5_G = 5
 
-@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
 @SuppressWarnings("deprecation")
 @SuppressLint("MissingPermission")
+@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
 fun isNetworkAvailable(context: Context): Boolean {
     val connectivityManager = context.getSystemService(
         Context.CONNECTIVITY_SERVICE
     ) as ConnectivityManager
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        val nw = connectivityManager.activeNetwork ?: return false
-        val actNw = connectivityManager.getNetworkCapabilities(nw) ?: return false
-        return when {
-            actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
-            actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
-            // for other device how are able to connect with Ethernet
-            actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
-            // for check internet over Bluetooth
-            actNw.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH) -> true
-            else -> false
-        }
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+            ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            ?: false
     } else {
-        val nwInfo = connectivityManager.activeNetworkInfo ?: return false
-        return nwInfo.isConnected
+        connectivityManager.activeNetworkInfo?.isConnectedOrConnecting ?: false
     }
 }
 
@@ -52,20 +43,28 @@ fun operatorName(context: Context): String {
 fun operatorNameZh(context: Context): String {
     val operatorName = operatorName(context).toLowerCase()
     return when {
-        operatorName.contains("unicom", false) -> "中国联通"
-        operatorName.contains("mobile") -> "中国移动"
-        operatorName.contains("telecom") -> "中国电信"
-        operatorName.contains("netcom") -> "中国网通"
+        operatorName.contains("unicom", true) -> "中国联通"
+        operatorName.contains("mobile", true) -> "中国移动"
+        operatorName.contains("telecom", true) -> "中国电信"
+        operatorName.contains("netcom", true) -> "中国网通"
         else -> operatorName
     }
 }
 
+@SuppressWarnings("deprecation")
+@SuppressLint("MissingPermission")
+@RequiresPermission(Manifest.permission.READ_PHONE_STATE)
 fun networkType(context: Context): Int {
     val telephonyManager = context.getSystemService(
         Context.TELEPHONY_SERVICE
     ) as TelephonyManager
 
-    return when (telephonyManager.networkType) {
+    val type = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        telephonyManager.dataNetworkType
+    } else {
+        telephonyManager.networkType
+    }
+    return when (type) {
         TelephonyManager.NETWORK_TYPE_GPRS,
         TelephonyManager.NETWORK_TYPE_EDGE,
         TelephonyManager.NETWORK_TYPE_CDMA,
