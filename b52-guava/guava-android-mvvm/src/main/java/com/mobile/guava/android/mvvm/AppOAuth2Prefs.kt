@@ -7,12 +7,7 @@ import com.tencent.mmkv.MMKV
 import com.tencent.mmkv.MMKVLogLevel
 import timber.log.Timber
 
-object AppOAuth2Prefs : OAuth2Prefs {
-
-    private val dataStore: MMKV by lazy {
-        MMKV.initialize(AndroidX.myApp, MMKVLogLevel.LevelNone)
-        return@lazy MMKV.defaultMMKV()
-    }
+abstract class AppOAuth2Prefs : OAuth2Prefs {
 
     override var loginName: String
         get() = dataStore.decodeString("loginName", "")
@@ -59,7 +54,13 @@ object AppOAuth2Prefs : OAuth2Prefs {
             return deviceId
         }
 
-    fun requireDataStore(): MMKV = dataStore
+    companion object {
+
+        val dataStore: MMKV by lazy {
+            MMKV.initialize(AndroidX.myApp, MMKVLogLevel.LevelNone)
+            return@lazy MMKV.defaultMMKV()
+        }
+    }
 
     fun verifyToken(): Boolean = token.length >= 16
 }
