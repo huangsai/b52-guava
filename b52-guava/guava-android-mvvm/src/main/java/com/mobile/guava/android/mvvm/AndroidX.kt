@@ -4,10 +4,9 @@ import android.app.Application
 import androidx.lifecycle.MutableLiveData
 import com.mobile.guava.jvm.Guava
 import com.mobile.guava.jvm.coroutines.Bus
-import com.mobile.guava.jvm.domain.LibX
 import timber.log.Timber
 
-object AndroidX : LibX {
+object AndroidX {
 
     const val APK_PACKAGE_ARCHIVE_TYPE = "application/vnd.android.package-archive"
     const val ASSETS = "file:///android_asset/"
@@ -32,10 +31,10 @@ object AndroidX : LibX {
         private set
 
     fun setup(app: Application, isDebug: Boolean) {
-        if (isAlreadyInitialized) {
+        if (::myApp.isInitialized) {
             return
         }
-        
+
         myApp = app
         Guava.isDebug = isDebug
         Guava.timber = AppTimber()
@@ -59,7 +58,4 @@ object AndroidX : LibX {
         appDialogCount.value = appDialogCount.value!! - 1
         Bus.offer(BUS_DIALOG_COUNT)
     }
-
-    override val isAlreadyInitialized: Boolean
-        get() = ::myApp.isInitialized
 }
