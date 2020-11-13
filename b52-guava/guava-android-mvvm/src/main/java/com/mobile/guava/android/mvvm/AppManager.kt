@@ -17,6 +17,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.mobile.guava.android.net.isNetworkAvailable
+import com.mobile.guava.android.postToMainThread
 import timber.log.Timber
 import java.lang.ref.WeakReference
 
@@ -212,7 +213,9 @@ object AppManager : LifecycleObserver, Application.ActivityLifecycleCallbacks {
     @RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
     private fun notifyNetworkChanged(isConnected: Boolean) {
         if (isConnected != AndroidX.isNetworkConnected.value) {
-            AndroidX.isNetworkConnected.value = isConnected
+            postToMainThread {
+                AndroidX.isNetworkConnected.value = isConnected
+            }
         }
     }
 }
