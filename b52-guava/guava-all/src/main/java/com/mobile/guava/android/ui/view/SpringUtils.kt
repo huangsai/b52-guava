@@ -22,7 +22,7 @@ import androidx.dynamicanimation.animation.DynamicAnimation
 import androidx.dynamicanimation.animation.DynamicAnimation.ViewProperty
 import androidx.dynamicanimation.animation.SpringAnimation
 import androidx.dynamicanimation.animation.SpringForce
-import com.mobile.guava.android.ui.R
+import com.mobile.guava.R
 
 /**
  * An extension function which creates/retrieves a [SpringAnimation] and stores it in the [View]s
