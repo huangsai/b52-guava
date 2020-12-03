@@ -13,7 +13,7 @@ import android.view.animation.Interpolator;
 import android.widget.LinearLayout;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.mobile.guava.R;
+import com.mobile.guava.android.ui.R;
 
 public class ExpandableLayout2 extends ConstraintLayout {
     public interface State {

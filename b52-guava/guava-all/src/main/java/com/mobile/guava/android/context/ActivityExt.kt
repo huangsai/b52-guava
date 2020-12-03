@@ -5,7 +5,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.mobile.guava.android.ime.ImeUtils
 import android.content.pm.ActivityInfo
+import android.os.Build
 import android.view.WindowManager
+import androidx.annotation.ColorRes
 
 fun FragmentActivity.instantiate(className: String): Fragment {
     return supportFragmentManager.fragmentFactory.instantiate(classLoader, className)
@@ -38,3 +40,19 @@ fun Activity.requestNormalScreenWithPortrait() {
 }
 
 fun Activity.isLandscape(): Boolean = requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+
+fun Activity.applyStatusBarColor(@ColorRes colorRes: Int) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        window.statusBarColor = resources.getColor(colorRes, theme)
+    } else {
+        window.statusBarColor = resources.getColor(colorRes)
+    }
+}
+
+fun Activity.applyNavigationBarColor(@ColorRes colorRes: Int) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        window.navigationBarColor = resources.getColor(colorRes, theme)
+    } else {
+        window.navigationBarColor = resources.getColor(colorRes)
+    }
+}

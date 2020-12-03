@@ -5,6 +5,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.os.Build
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
@@ -76,7 +77,13 @@ fun Context.getStatusBarHeight(): Int {
 }
 
 @ColorInt
-fun Context.toColor(@ColorRes id: Int): Int = ContextCompat.getColor(this, id)
+fun Context.toColor(@ColorRes id: Int): Int {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        resources.getColor(id, theme)
+    } else {
+        resources.getColor(id)
+    }
+}
 
 fun Context.toColorDrawable(@ColorRes id: Int) = ColorDrawable(toColor(id))
 
