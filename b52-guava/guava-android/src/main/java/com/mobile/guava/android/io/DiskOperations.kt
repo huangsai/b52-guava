@@ -2,18 +2,18 @@ package com.mobile.guava.android.io
 
 import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import androidx.annotation.WorkerThread
-import com.mobile.guava.android.context.AppUtils
 import com.mobile.guava.android.ensureWorkThread
 import okhttp3.internal.io.FileSystem
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.*
+import java.io.FileOutputStream
+import java.io.OutputStream
 
 object DiskOperations {
 
@@ -41,80 +41,122 @@ object DiskOperations {
     @WorkerThread
     fun createImageFile(context: Context, prefix: String): File {
         ensureWorkThread()
-        val timeStamp: String = SimpleDateFormat(DATA_PATTERN, Locale.US).format(Date())
+        val timeStamp: String = System.currentTimeMillis().toString()
         val storageDir: File = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
-        return File.createTempFile(
-            "${prefix + timeStamp}_",
-            ".jpg",
-            storageDir
-        )
+        val file = File(storageDir, "${prefix + timeStamp}.jpg")
+        if (file.exists()) {
+            file.delete()
+        }
+        file.createNewFile()
+        return file
     }
 
     @WorkerThread
-    fun saveImage(context: Context, uri: Uri) {
+    fun saveImage(context: Context, uri: Uri): String {
         ensureWorkThread()
-        context.contentResolver.openInputStream(uri).use { inputStream ->
-            val collection = MediaStore.Images.Media.getContentUri(
-                MediaStore.VOLUME_EXTERNAL_PRIMARY
+        var sPath = ""
+        val filename = uri.lastPathSegment!!
+        val extension = filename.split(".").last()
+
+        var fos: OutputStream?
+        val conValues = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
+            put(MediaStore.MediaColumns.MIME_TYPE, "image/$extension")
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            conValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+            val imageUri: Uri? = context.contentResolver.insert(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                conValues
             )
-            val dirDest = File(Environment.DIRECTORY_PICTURES, AppUtils.getName(context))
-            val timeStamp: String = SimpleDateFormat(DATA_PATTERN, Locale.US).format(Date())
-            val extension = IMAGE_EXTENSION_JPG
-
-            val newImage = ContentValues().apply {
-                put(MediaStore.Images.Media.DISPLAY_NAME, "$timeStamp.$extension")
-                put(MediaStore.MediaColumns.MIME_TYPE, "image/$extension")
-                put(MediaStore.MediaColumns.DATE_ADDED, timeStamp)
-                put(MediaStore.MediaColumns.DATE_MODIFIED, timeStamp)
-                put(MediaStore.MediaColumns.RELATIVE_PATH, "$dirDest${File.separator}")
-                put(MediaStore.Images.Media.IS_PENDING, 1)
-            }
-
-            context.contentResolver.insert(collection, newImage)?.let { newImageUri ->
-                context.contentResolver.openOutputStream(newImageUri, "w").use { outputStream ->
+            fos = imageUri?.let { context.contentResolver.openOutputStream(it, "w") }
+            fos?.use { outputStream ->
+                context.contentResolver.openInputStream(uri).use { inputStream ->
                     FileUtils.transfer(inputStream, outputStream, 1024)
                 }
-                newImage.clear()
-                newImage.put(MediaStore.Images.Media.IS_PENDING, 0)
-                context.contentResolver.update(newImageUri, newImage, null, null)
+                conValues.clear()
+                conValues.put(MediaStore.Images.Media.IS_PENDING, 1)
+                context.contentResolver.update(imageUri!!, conValues, null, null)
+
+                sPath = Environment.DIRECTORY_PICTURES + File.separator + filename
             }
+        } else {
+            val imagesDir = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES
+            )
+            val imageFile = File(imagesDir, filename)
+            fos = FileOutputStream(imageFile)
+            fos?.use { outputStream ->
+                context.contentResolver.openInputStream(uri).use { inputStream ->
+                    FileUtils.transfer(inputStream, outputStream, 1024)
+                }
+                sPath = imageFile.absolutePath
+            }
+
+            conValues.put(MediaStore.MediaColumns.RELATIVE_PATH, imageFile.absolutePath)
+            context.contentResolver.insert(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                conValues
+            )
+            context.sendBroadcast(
+                Intent(
+                    "android.intent.action.MEDIA_SCANNER_SCAN_FILE",
+                    Uri.parse("file://" + imageFile.absolutePath)
+                )
+            )
         }
+        return sPath
     }
 
     @WorkerThread
-    fun saveImage(
-        context: Context,
-        bitmap: Bitmap,
-        format: Bitmap.CompressFormat
-    ) {
+    fun saveImage(context: Context, bitmap: Bitmap): String {
         ensureWorkThread()
-        val collection = MediaStore.Images.Media.getContentUri(
-            MediaStore.VOLUME_EXTERNAL_PRIMARY
-        )
-        val dirDest = File(Environment.DIRECTORY_PICTURES, AppUtils.getName(context))
-        val timeStamp: String = SimpleDateFormat(DATA_PATTERN, Locale.US).format(Date())
-        val extension = getImageExtension(format)
+        var sPath = ""
+        val timeStamp: String = System.currentTimeMillis().toString()
+        val filename = "$timeStamp.$IMAGE_EXTENSION_JPG"
 
-        val newImage = ContentValues().apply {
-            put(MediaStore.Images.Media.DISPLAY_NAME, "$timeStamp.$extension")
-            put(MediaStore.MediaColumns.MIME_TYPE, "image/$extension")
-            put(MediaStore.MediaColumns.DATE_ADDED, timeStamp)
-            put(MediaStore.MediaColumns.DATE_MODIFIED, timeStamp)
+        var fos: OutputStream?
+        val conValues = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
+            put(MediaStore.MediaColumns.MIME_TYPE, "image/$IMAGE_EXTENSION_JPG")
             put(MediaStore.MediaColumns.SIZE, bitmap.byteCount)
             put(MediaStore.MediaColumns.WIDTH, bitmap.width)
             put(MediaStore.MediaColumns.HEIGHT, bitmap.height)
-            put(MediaStore.MediaColumns.RELATIVE_PATH, "$dirDest${File.separator}")
             put(MediaStore.Images.Media.IS_PENDING, 1)
         }
-
-        context.contentResolver.insert(collection, newImage)?.let { newImageUri ->
-            context.contentResolver.openOutputStream(newImageUri, "w").use {
-                bitmap.compress(format, QUALITY, it)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            conValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+            val imageUri: Uri? = context.contentResolver.insert(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                conValues
+            )
+            fos = imageUri?.let { context.contentResolver.openOutputStream(it) }
+            fos?.use {
+                bitmap.compress(Bitmap.CompressFormat.JPEG, QUALITY, it)
+                sPath = Environment.DIRECTORY_PICTURES + File.separator + filename
             }
-            newImage.clear()
-            newImage.put(MediaStore.Images.Media.IS_PENDING, 0)
-            context.contentResolver.update(newImageUri, newImage, null, null)
+        } else {
+            val imagesDir = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES
+            )
+            val imageFile = File(imagesDir, filename)
+            fos = FileOutputStream(imageFile)
+            fos?.use {
+                bitmap.compress(Bitmap.CompressFormat.JPEG, QUALITY, it)
+                sPath = imageFile.absolutePath
+            }
+            conValues.put(MediaStore.MediaColumns.RELATIVE_PATH, imageFile.absolutePath)
+            context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, conValues)
+            context.sendBroadcast(
+                Intent(
+                    "android.intent.action.MEDIA_SCANNER_SCAN_FILE",
+                    Uri.parse("file://" + imageFile.absolutePath)
+                )
+            )
         }
+
+        return sPath
     }
 
     private fun getImageFormat(type: String): Bitmap.CompressFormat {
